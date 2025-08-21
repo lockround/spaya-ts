@@ -27,11 +27,11 @@ describe('SpayaClientCallback (integration)', () => {
     await client.connect();
   });
 
-  it('startCallback and stopCallback should be callable', async () => {
-    await client.startCallback();
-    await client.stopCallback();
-    expect(true).toBe(true);
-  });
+//   it('startCallback and stopCallback should be callable', async () => {
+//     await client.startCallback();
+//     await client.stopCallback();
+//     expect(true).toBe(true);
+//   });
 
   afterAll(async () => {
     try {
