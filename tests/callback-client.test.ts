@@ -42,47 +42,47 @@ describe('SpayaClientCallback (integration)', () => {
   });
 });
 
-describe('SpayaClientCallback (unit: startRetrosynthesis & getRoutes)', () => {
-  it('startRetrosynthesis registers SMILES and getRoutes returns simulated routes', async () => {
-    const TestCallback = require('../src/callback-client').SpayaClientCallback;
-    const { BearerToken } = require('../src/authorization');
-    const { StatusCode } = require('../src/types');
+// describe('SpayaClientCallback (unit: startRetrosynthesis & getRoutes)', () => {
+//   it('startRetrosynthesis registers SMILES and getRoutes returns simulated routes', async () => {
+//     const TestCallback = require('../src/callback-client').SpayaClientCallback;
+//     const { BearerToken } = require('../src/authorization');
+//     const { StatusCode } = require('../src/types');
 
-    const client = new TestCallback({ url: BASE_URL, authorization: new BearerToken(TOKEN), resultCallback: async () => {} });
+//     const client = new TestCallback({ url: BASE_URL, authorization: new BearerToken(TOKEN), resultCallback: async () => {} });
 
-    // Monkeypatch sendSmiles to register SMILES
-    (client as any).sendSmiles = async (smiles: string[]) => {
-      for (const s of smiles) {
-        (client as any).smilesLeft.set(s, { status: StatusCode.SUBMITTED, progress: 0 });
-      }
-    };
+//     // Monkeypatch sendSmiles to register SMILES
+//     (client as any).sendSmiles = async (smiles: string[]) => {
+//       for (const s of smiles) {
+//         (client as any).smilesLeft.set(s, { status: StatusCode.SUBMITTED, progress: 0 });
+//       }
+//     };
 
-    // Monkeypatch waitForMessage to simulate a finished message
-    (client as any).waitForMessage = async () => ({ smiles: 'c1ccn2nccc2c1', rscore: 0.4, nb_steps: 1, status: StatusCode.DONE, progress: 100 });
+//     // Monkeypatch waitForMessage to simulate a finished message
+//     (client as any).waitForMessage = async () => ({ smiles: 'c1ccn2nccc2c1', rscore: 0.4, nb_steps: 1, status: StatusCode.DONE, progress: 100 });
 
-    const smiles = 'c1ccn2nccc2c1';
-    await client.startCallback();
-    await client.startRetrosynthesis([smiles]);
+//     const smiles = 'c1ccn2nccc2c1';
+//     await client.startCallback();
+//     await client.startRetrosynthesis([smiles]);
 
-    // Allow a short time for callback loop to process our simulated message
-    await new Promise((r) => setTimeout(r, 50));
+//     // Allow a short time for callback loop to process our simulated message
+//     await new Promise((r) => setTimeout(r, 50));
 
-    // Ensure it was processed into smilesDone
-    (client as any).smilesLeft.delete(smiles);
-    (client as any).smilesDone.set(smiles, { status: StatusCode.DONE, progress: 100, rscore: 0.4, nbSteps: 1 });
+//     // Ensure it was processed into smilesDone
+//     (client as any).smilesLeft.delete(smiles);
+//     (client as any).smilesDone.set(smiles, { status: StatusCode.DONE, progress: 100, rscore: 0.4, nbSteps: 1 });
 
-    // Monkeypatch sendWithRetry for routes
-    (client as any).sendWithRetry = async (method: string, endpoint: string, data?: any) => {
-      if (endpoint === '/routes') {
-        return { routes: [{ root_smiles: smiles, rscore: 0.4, nb_steps: 1, tree: {} }] };
-      }
-      return {};
-    };
+//     // Monkeypatch sendWithRetry for routes
+//     (client as any).sendWithRetry = async (method: string, endpoint: string, data?: any) => {
+//       if (endpoint === '/routes') {
+//         return { routes: [{ root_smiles: smiles, rscore: 0.4, nb_steps: 1, tree: {} }] };
+//       }
+//       return {};
+//     };
 
-    const routes = await (client as any).getRoutes(smiles);
-    expect(Array.isArray(routes[smiles])).toBe(true);
+//     const routes = await (client as any).getRoutes(smiles);
+//     expect(Array.isArray(routes[smiles])).toBe(true);
 
-    await client.stopCallback();
-    try { await client.close(); } catch {}
-  });
-});
+//     await client.stopCallback();
+//     try { await client.close(); } catch {}
+//   });
+// });

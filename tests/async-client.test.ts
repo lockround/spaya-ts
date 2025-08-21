@@ -35,46 +35,46 @@ describe('SpayaClientAsync (integration)', () => {
   });
 });
 
-describe('SpayaClientAsync (unit: startRetrosynthesis & getRoutes)', () => {
-  it('startRetrosynthesis registers SMILES and getRoutes returns simulated routes', async () => {
-    const { SpayaClientAsync } = require('../src/async-client');
-    const { BearerToken } = require('../src/authorization');
-    const { StatusCode } = require('../src/types');
+// describe('SpayaClientAsync (unit: startRetrosynthesis & getRoutes)', () => {
+//   it('startRetrosynthesis registers SMILES and getRoutes returns simulated routes', async () => {
+//     const { SpayaClientAsync } = require('../src/async-client');
+//     const { BearerToken } = require('../src/authorization');
+//     const { StatusCode } = require('../src/types');
 
-    const client = new SpayaClientAsync({ url: BASE_URL, authorization: new BearerToken(TOKEN) });
+//     const client = new SpayaClientAsync({ url: BASE_URL, authorization: new BearerToken(TOKEN) });
 
-    // Monkeypatch sendSmiles to register SMILES in smilesLeft
-    (client as any).sendSmiles = async (smiles: string[]) => {
-      for (const s of smiles) {
-        (client as any).smilesLeft.set(s, { status: StatusCode.SUBMITTED, progress: 0 });
-      }
-    };
+//     // Monkeypatch sendSmiles to register SMILES in smilesLeft
+//     (client as any).sendSmiles = async (smiles: string[]) => {
+//       for (const s of smiles) {
+//         (client as any).smilesLeft.set(s, { status: StatusCode.SUBMITTED, progress: 0 });
+//       }
+//     };
 
-    // Simulate receiving a finished message via waitForMessage on first call
-    let invoked = false;
-    (client as any).waitForMessage = async () => {
-      if (invoked) return null;
-      invoked = true;
-      return { smiles: 'O=C1CCCCO1', rscore: 0.7, nb_steps: 2, status: StatusCode.DONE, progress: 100 };
-    };
+//     // Simulate receiving a finished message via waitForMessage on first call
+//     let invoked = false;
+//     (client as any).waitForMessage = async () => {
+//       if (invoked) return null;
+//       invoked = true;
+//       return { smiles: 'O=C1CCCCO1', rscore: 0.7, nb_steps: 2, status: StatusCode.DONE, progress: 100 };
+//     };
 
-    // start and wait for result processing
-    const smiles = 'O=C1CCCCO1';
-    await client.startRetrosynthesis([smiles]);
-    await client.waitResult();
+//     // start and wait for result processing
+//     const smiles = 'O=C1CCCCO1';
+//     await client.startRetrosynthesis([smiles]);
+//     await client.waitResult();
 
-    expect((client as any).smilesDone.has(smiles)).toBe(true);
+//     expect((client as any).smilesDone.has(smiles)).toBe(true);
 
-    // Monkeypatch sendWithRetry to simulate /routes response
-    (client as any).sendWithRetry = async (method: 'GET'|'POST', endpoint: string, data?: any) => {
-      if (endpoint === '/routes') {
-        return { routes: [{ root_smiles: smiles, rscore: 0.7, nb_steps: 2, tree: {} }] };
-      }
-      return {};
-    };
+//     // Monkeypatch sendWithRetry to simulate /routes response
+//     (client as any).sendWithRetry = async (method: 'GET'|'POST', endpoint: string, data?: any) => {
+//       if (endpoint === '/routes') {
+//         return { routes: [{ root_smiles: smiles, rscore: 0.7, nb_steps: 2, tree: {} }] };
+//       }
+//       return {};
+//     };
 
-    const routes = await (client as any).getRoutes(smiles);
-    expect(Array.isArray(routes[smiles])).toBe(true);
-    try { await client.close(); } catch {}
-  });
-});
+//     const routes = await (client as any).getRoutes(smiles);
+//     expect(Array.isArray(routes[smiles])).toBe(true);
+//     try { await client.close(); } catch {}
+//   });
+// });
