@@ -11,36 +11,36 @@ if (!TOKEN || !BASE_URL) {
   throw new Error('Integration tests require SPAYA_TOKEN and SPAYA_BASE_URL environment variables');
 }
 
-describe('SpayaClientCallback (integration)', () => {
-  let client: SpayaClientCallback;
+// describe('SpayaClientCallback (integration)', () => {
+//   let client: SpayaClientCallback;
 
-  beforeAll(async () => {
-    client = new SpayaClientCallback({
-      url: BASE_URL,
-      authorization: new BearerToken(TOKEN),
-      resultCallback: async () => {
-        // noop for integration smoke
-      }
-    });
+//   beforeAll(async () => {
+//     client = new SpayaClientCallback({
+//       url: BASE_URL,
+//       authorization: new BearerToken(TOKEN),
+//       resultCallback: async () => {
+//         // noop for integration smoke
+//       }
+//     });
 
-    // connect will start callback loop
-    await client.connect();
-  });
-
-//   it('startCallback and stopCallback should be callable', async () => {
-//     await client.startCallback();
-//     await client.stopCallback();
-//     expect(true).toBe(true);
+//     // connect will start callback loop
+//     await client.connect();
 //   });
 
-  afterAll(async () => {
-    try {
-      await client.close();
-    } catch (e) {
-      // best-effort close
-    }
-  });
-});
+// //   it('startCallback and stopCallback should be callable', async () => {
+// //     await client.startCallback();
+// //     await client.stopCallback();
+// //     expect(true).toBe(true);
+// //   });
+
+//   afterAll(async () => {
+//     try {
+//       await client.close();
+//     } catch (e) {
+//       // best-effort close
+//     }
+//   });
+// });
 
 // describe('SpayaClientCallback (unit: startRetrosynthesis & getRoutes)', () => {
 //   it('startRetrosynthesis registers SMILES and getRoutes returns simulated routes', async () => {
